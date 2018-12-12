@@ -24,7 +24,11 @@ public:
 
     MatrixTemplate<T> product(MatrixTemplate<T>& b);
 
-    MatrixTemplate<T> productscalare(int scalare);
+    MatrixTemplate<T> somma(MatrixTemplate<T>& a);
+
+    MatrixTemplate<T> productscalare(T scalare);
+
+    MatrixTemplate<T> sommascalare(T scalare);
 
     MatrixTemplate<T> trasposta();
 
@@ -34,61 +38,13 @@ public:
 
     void print();
 
-    MatrixTemplate<T>& operator=(const MatrixTemplate<T>& ugualianza);
-
-    MatrixTemplate<T> operator+(const MatrixTemplate<T>& somma);
-
-    MatrixTemplate<T> operator*(const MatrixTemplate<T>& prodotto);
 
 private:
      int columns;
      int rows;
      T** matrix;
 };
-template<typename T>
-MatrixTemplate<T>& MatrixTemplate<T>::operator=(const MatrixTemplate<T>& ugualianza){
-   if(this != &ugualianza){
-       delete[] matrix;
-       rows=ugualianza.rows;
-       columns=ugualianza.columns;
-       T** matrix= new T*[columns];
-       for (int i=0;i<columns;i=i+1){
-           matrix[i] = new T[rows];
-       }
-       for(int i=0;i<rows;i++){
-           for(int j=0;j<columns;j++){
-               matrix[i][j]=ugualianza.matrix[i][j];
-           }
-       }
-   }
-}
-template<typename T>
-MatrixTemplate<T> MatrixTemplate<T>::operator+(const MatrixTemplate<T>& somma){
-if(this->rows == somma.rows || this->columns == somma.columns){
-    MatrixTemplate<T> summatrix(rows,columns);
-    for(int i=0;i<rows;i++){
-        for(int j=0;j<columns;j++){
-            summatrix.matrix[i][j]=matrix[i][j] + somma.matrix[i][j];
-        }
-    }
-    return summatrix;
-}
-}
-template<typename T>
-MatrixTemplate<T> MatrixTemplate<T>::operator*(const MatrixTemplate<T>& prodotto) {
-    if (this->columns == prodotto.rows) {
-        MatrixTemplate<T> prodmatrix(rows, prodmatrix.columns);
-        for (int i = 0; i < (rows); i = i + 1) {
-            for (int j = 0; j < (prodotto.columns); j = j + 1) {
-                prodmatrix.matrix[i][j] = 0;
-                for (int l = 0; l < (columns); l = l + 1) {
-                    prodmatrix.matrix[i][j] = prodmatrix.matrix[i][j] + matrix[i][l] * prodotto.matrix[l][j];
-                }
-            }
-        }
-        return prodmatrix;
-    }
-}
+
 template<typename T>
 void MatrixTemplate<T>::print(){
     for(int i=0;i<(rows);i++) {
@@ -98,50 +54,37 @@ void MatrixTemplate<T>::print(){
         std::cout<<std::endl;
     }
 }
+
 template<typename T>
 MatrixTemplate<T>::~MatrixTemplate() {
     for (int i=0;i<rows;i=i+1){
         delete[] matrix[i];
     }
 }
+
 template <typename T>
 MatrixTemplate<T> MatrixTemplate<T>::product(MatrixTemplate<T>& b) {
     if (columns != b.rows) {
         throw std::out_of_range("disaccordo tra le due matrici");
     }
     else {
-        if(rows==b.columns) {
-            MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,columns);
-            for (int i = 0; i < (rows); i = i + 1) {
-                for (int j = 0; j < (b.columns); j = j + 1) {
-                    d->matrix[i][j] = 0;
-                    for (int l = 0; l < (columns); l = l + 1) {
-                        d->matrix[i][j] = d->matrix[i][j] + matrix[i][l] * b.matrix[l][j];
-                    }
-                    std::cout << "" << d->matrix[i][j];
+        MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,rows);
+        for (int i = 0; i < (rows); i = i + 1) {
+            for (int j = 0; j < (b.columns); j = j + 1) {
+                d->matrix[i][j] = 0;
+                for (int l = 0; l < (columns); l = l + 1) {
+                    d->matrix[i][j] = d->matrix[i][j] + matrix[i][l] * b.matrix[l][j];
                 }
-                std::cout<<std::endl;
+                std::cout << "" << d->matrix[i][j];
             }
-            return (*d);
+            std::cout<<std::endl;
         }
-        else {
-            MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,rows);
-            for (int i = 0; i < (rows); i = i + 1) {
-                for (int j = 0; j < (b.columns); j = j + 1) {
-                    d->matrix[i][j] = 0;
-                    for (int l = 0; l < (columns); l = l + 1) {
-                        d->matrix[i][j] = d->matrix[i][j] + matrix[i][l] * b.matrix[l][j];
-                    }
-                    std::cout << "" << d->matrix[i][j];
-                }
-                std::cout<<std::endl;
-            }
-            return (*d);
-        }
+        return (*d);
     }
 }
+
 template <typename T>
-MatrixTemplate<T> MatrixTemplate<T>::productscalare(int scalare) {
+MatrixTemplate<T> MatrixTemplate<T>::productscalare(T scalare) {
     MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,columns);
     for (int i = 0; i < (rows); i = i + 1) {
         for (int j = 0; j < (columns); j = j + 1) {
@@ -153,6 +96,40 @@ MatrixTemplate<T> MatrixTemplate<T>::productscalare(int scalare) {
     }
     return (*d);
 }
+
+template <typename T>
+MatrixTemplate<T> MatrixTemplate<T>::somma(MatrixTemplate<T>& a) {
+    if (columns != a.columns && rows!=a.rows) {
+        throw std::out_of_range("disaccordo tra le due matrici");
+    }
+    else {
+        MatrixTemplate<T> *d = new MatrixTemplate<T>(rows, columns);
+        for (int i = 0; i < (rows); i = i + 1) {
+            for (int j = 0; j < (columns); j = j + 1) {
+                d->matrix[i][j] = 0;
+                d->matrix[i][j] = d->matrix[i][j] + ( matrix[i][j] + a.matrix[i][j] );
+                std::cout << "" << d->matrix[i][j];
+            }
+            std::cout << std::endl;
+        }
+        return (*d);
+    }
+}
+
+template <typename T>
+MatrixTemplate<T> MatrixTemplate<T>::sommascalare(T scalare) {
+    MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,columns);
+    for (int i = 0; i < (rows); i = i + 1) {
+        for (int j = 0; j < (columns); j = j + 1) {
+            d->matrix[i][j] = 0;
+            d->matrix[i][j] = d->matrix[i][j] + ( matrix[i][j] + scalare );
+            std::cout << "" << d->matrix[i][j];
+        }
+        std::cout<<std::endl;
+    }
+    return (*d);
+}
+
 
 template <typename T>
 MatrixTemplate<T> MatrixTemplate<T>::trasposta() {

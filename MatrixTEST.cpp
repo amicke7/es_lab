@@ -3,6 +3,7 @@
 #include "../MatrixTemplate.h"
 #include <iostream>
 #include <random>
+
 TEST(MatrixTemplate, testConstructor) {
     MatrixTemplate<int> testMatrix(3, 3);
     srand((unsigned) time(nullptr));
@@ -118,4 +119,60 @@ TEST(MatrixTemplate,testProductFail){
         }
     }
     ASSERT_THROW(Matrix1.product(Matrix2), std::out_of_range);
+}
+
+TEST(MatrixTemplate, testSomma){
+    MatrixTemplate<int>secondMatrix(2,2);
+    MatrixTemplate<int>treMatrix(2,2);
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < secondMatrix.getRows(); i++) {
+        for (int j = 0; j < secondMatrix.getColumns(); j++) {
+            secondMatrix.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < treMatrix.getRows(); i++) {
+        for (int j = 0; j < treMatrix.getColumns(); j++) {
+            treMatrix.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    MatrixTemplate<int> sommaMatrix = secondMatrix.somma(treMatrix);
+    ASSERT_EQ(sommaMatrix.selection(0,0), ( secondMatrix.selection(0,0) + treMatrix.selection(0,0) ) );
+    ASSERT_EQ(sommaMatrix.selection(0,1), ( secondMatrix.selection(0,1) + treMatrix.selection(0,1) ) );
+    ASSERT_EQ(sommaMatrix.selection(1,0), ( secondMatrix.selection(1,0) + treMatrix.selection(1,0) ) );
+    ASSERT_EQ(sommaMatrix.selection(1,1), ( secondMatrix.selection(1,1) + treMatrix.selection(1,1) ) );
+
+}
+
+TEST(MatrixTemplate, testSommaScalare){
+    MatrixTemplate<int>Matrix(2,2);
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < Matrix.getRows(); i++) {
+        for (int j = 0; j < Matrix.getColumns(); j++) {
+            Matrix.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    MatrixTemplate<int> sommaMatrix = Matrix.sommascalare(3);
+    ASSERT_EQ(sommaMatrix.selection(0,0), Matrix.selection(0,0)+3 );
+    ASSERT_EQ(sommaMatrix.selection(0,1), Matrix.selection(0,1)+3 );
+    ASSERT_EQ(sommaMatrix.selection(1,0), Matrix.selection(1,0)+3 );
+    ASSERT_EQ(sommaMatrix.selection(1,1), Matrix.selection(1,1)+3 );
+}
+
+TEST(MatrixTemplate,testSommaFail){
+    MatrixTemplate<int>Matrix1(2,2);
+    MatrixTemplate<int>Matrix2(3,3);
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < Matrix1.getRows(); i++) {
+        for (int j = 0; j < Matrix1.getColumns(); j++) {
+            Matrix1.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < Matrix2.getRows(); i++) {
+        for (int j = 0; j < Matrix2.getColumns(); j++) {
+            Matrix2.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    ASSERT_THROW(Matrix1.somma(Matrix2), std::out_of_range);
 }
