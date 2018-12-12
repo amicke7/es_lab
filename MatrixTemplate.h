@@ -22,9 +22,9 @@ public:
 
     int getRows() const;
 
-    T **getMatrix() const;
-
     MatrixTemplate<T> product(MatrixTemplate<T>& b);
+
+    MatrixTemplate<T> productscalare(int scalare);
 
     MatrixTemplate<T> trasposta();
 
@@ -141,6 +141,20 @@ MatrixTemplate<T> MatrixTemplate<T>::product(MatrixTemplate<T>& b) {
     }
 }
 template <typename T>
+MatrixTemplate<T> MatrixTemplate<T>::productscalare(int scalare) {
+    MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,columns);
+    for (int i = 0; i < (rows); i = i + 1) {
+        for (int j = 0; j < (columns); j = j + 1) {
+            d->matrix[i][j] = 1;
+            d->matrix[i][j] = d->matrix[i][j] *( matrix[i][j] * scalare );
+            std::cout << "" << d->matrix[i][j];
+        }
+        std::cout<<std::endl;
+    }
+    return (*d);
+}
+
+template <typename T>
 MatrixTemplate<T> MatrixTemplate<T>::trasposta() {
     MatrixTemplate<T>* f=new MatrixTemplate<T>(columns,rows);
     for (int i = 0; i<(columns);i++) {
@@ -181,10 +195,7 @@ int MatrixTemplate<T>::getRows() const {
     return rows;
 }
 
-template <typename T>
-T **MatrixTemplate<T>::getMatrix() const {
-    return matrix;
-}
+
 
 
 #endif //ES_LAB_PROGRAMMAZIONE_MATRIXTEMPLATE_H

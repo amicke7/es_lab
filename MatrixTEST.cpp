@@ -5,6 +5,12 @@
 #include <random>
 TEST(MatrixTemplate, testConstructor) {
     MatrixTemplate<int> testMatrix(3, 3);
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < testMatrix.getRows(); i++) {
+        for (int j = 0; j < testMatrix.getColumns(); j++) {
+            testMatrix.insert((rand() % 10) + 1,i,j);
+        }
+    }
     testMatrix.print();
     bool anwser=true;
     for (int i = 0; i < testMatrix.getRows(); i++) {
@@ -13,9 +19,9 @@ TEST(MatrixTemplate, testConstructor) {
                 anwser = false;
             else
                 anwser=true;
+            ASSERT_EQ(anwser, false);
         }
     }
-    ASSERT_EQ(anwser, true);
 }
 
 TEST(MatrixTemplate, testRecMatrix) {
@@ -58,5 +64,58 @@ TEST(MatrixTemplate, testTranspose) {
     ASSERT_EQ(firstMatrix.selection(1,1), transposeMatrix.selection(1,1));
 }
 
+TEST(MatrixTemplate, testProduct){
+    MatrixTemplate<int>secondMatrix(2,3);
+    MatrixTemplate<int>treMatrix(3,2);
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < secondMatrix.getRows(); i++) {
+        for (int j = 0; j < secondMatrix.getColumns(); j++) {
+            secondMatrix.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < treMatrix.getRows(); i++) {
+        for (int j = 0; j < treMatrix.getColumns(); j++) {
+            treMatrix.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    MatrixTemplate<int> productMatrix = secondMatrix.product(treMatrix);
+    ASSERT_EQ(productMatrix.selection(0,0), ( secondMatrix.selection(0,0)*treMatrix.selection(0,0) ) + ( secondMatrix.selection(0,1)*treMatrix.selection(1,0) ) + ( secondMatrix.selection(0,2)*treMatrix.selection(2,0) ) );
+    ASSERT_EQ(productMatrix.selection(0,1), ( secondMatrix.selection(0,0)*treMatrix.selection(0,1) ) + ( secondMatrix.selection(0,1)*treMatrix.selection(1,1) ) + ( secondMatrix.selection(0,2)*treMatrix.selection(2,1) ) );
+    ASSERT_EQ(productMatrix.selection(1,0), ( secondMatrix.selection(1,0)*treMatrix.selection(0,0) ) + ( secondMatrix.selection(1,1)*treMatrix.selection(1,0) ) + ( secondMatrix.selection(1,2)*treMatrix.selection(2,0) ) );
+    ASSERT_EQ(productMatrix.selection(1,1), ( secondMatrix.selection(1,0)*treMatrix.selection(0,1) ) + ( secondMatrix.selection(1,1)*treMatrix.selection(1,1) ) + ( secondMatrix.selection(1,2)*treMatrix.selection(2,1) ) );
 
+}
 
+TEST(MatrixTemplate, testProductScalare){
+    MatrixTemplate<int>Matrix(2,2);
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < Matrix.getRows(); i++) {
+        for (int j = 0; j < Matrix.getColumns(); j++) {
+            Matrix.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    MatrixTemplate<int> product1Matrix = Matrix.productscalare(3);
+    ASSERT_EQ(product1Matrix.selection(0,0), Matrix.selection(0,0)*3 );
+    ASSERT_EQ(product1Matrix.selection(0,1), Matrix.selection(0,1)*3 );
+    ASSERT_EQ(product1Matrix.selection(1,0), Matrix.selection(1,0)*3 );
+    ASSERT_EQ(product1Matrix.selection(1,1), Matrix.selection(1,1)*3 );
+}
+
+TEST(MatrixTemplate,testProductFail){
+    MatrixTemplate<int>Matrix1(2,2);
+    MatrixTemplate<int>Matrix2(3,3);
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < Matrix1.getRows(); i++) {
+        for (int j = 0; j < Matrix1.getColumns(); j++) {
+            Matrix1.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    srand((unsigned) time(nullptr));
+    for (int i = 0; i < Matrix2.getRows(); i++) {
+        for (int j = 0; j < Matrix2.getColumns(); j++) {
+            Matrix2.insert((rand() % 10) + 1,i,j);
+        }
+    }
+    ASSERT_THROW(Matrix1.product(Matrix2), std::out_of_range);
+}
