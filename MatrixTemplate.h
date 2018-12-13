@@ -22,13 +22,13 @@ public:
 
     int getRows() const;
 
-    MatrixTemplate<T> product(MatrixTemplate<T>& b);
+    MatrixTemplate<T> operator*(const MatrixTemplate<T>& prodotto);
 
-    MatrixTemplate<T> somma(MatrixTemplate<T>& a);
+    MatrixTemplate<T> operator+(const MatrixTemplate<T>& somma);
 
-    MatrixTemplate<T> productscalare(T scalare);
+    MatrixTemplate<T> operator*( T scalare);
 
-    MatrixTemplate<T> sommascalare(T scalare);
+    MatrixTemplate<T>& operator=(const MatrixTemplate<T>& ugualianza);
 
     MatrixTemplate<T> trasposta();
 
@@ -63,17 +63,17 @@ MatrixTemplate<T>::~MatrixTemplate() {
 }
 
 template <typename T>
-MatrixTemplate<T> MatrixTemplate<T>::product(MatrixTemplate<T>& b) {
-    if (columns != b.rows) {
+MatrixTemplate<T> MatrixTemplate<T>::operator*(const MatrixTemplate<T>& prodotto) {
+    if (columns != prodotto.rows) {
         throw std::out_of_range("disaccordo tra le due matrici");
     }
     else {
         MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,rows);
         for (int i = 0; i < (rows); i = i + 1) {
-            for (int j = 0; j < (b.columns); j = j + 1) {
+            for (int j = 0; j < (prodotto.columns); j = j + 1) {
                 d->matrix[i][j] = 0;
                 for (int l = 0; l < (columns); l = l + 1) {
-                    d->matrix[i][j] = d->matrix[i][j] + matrix[i][l] * b.matrix[l][j];
+                    d->matrix[i][j] = d->matrix[i][j] + matrix[i][l] * prodotto.matrix[l][j];
                 }
                 std::cout << "" << d->matrix[i][j];
             }
@@ -84,7 +84,7 @@ MatrixTemplate<T> MatrixTemplate<T>::product(MatrixTemplate<T>& b) {
 }
 
 template <typename T>
-MatrixTemplate<T> MatrixTemplate<T>::productscalare(T scalare) {
+MatrixTemplate<T> MatrixTemplate<T>::operator*( T scalare) {
     MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,columns);
     for (int i = 0; i < (rows); i = i + 1) {
         for (int j = 0; j < (columns); j = j + 1) {
@@ -98,8 +98,8 @@ MatrixTemplate<T> MatrixTemplate<T>::productscalare(T scalare) {
 }
 
 template <typename T>
-MatrixTemplate<T> MatrixTemplate<T>::somma(MatrixTemplate<T>& a) {
-    if (columns != a.columns && rows!=a.rows) {
+MatrixTemplate<T> MatrixTemplate<T>::operator+(const MatrixTemplate<T>& somma) {
+    if (columns != somma.columns && rows!=somma.rows) {
         throw std::out_of_range("disaccordo tra le due matrici");
     }
     else {
@@ -107,7 +107,7 @@ MatrixTemplate<T> MatrixTemplate<T>::somma(MatrixTemplate<T>& a) {
         for (int i = 0; i < (rows); i = i + 1) {
             for (int j = 0; j < (columns); j = j + 1) {
                 d->matrix[i][j] = 0;
-                d->matrix[i][j] = d->matrix[i][j] + ( matrix[i][j] + a.matrix[i][j] );
+                d->matrix[i][j] = d->matrix[i][j] + ( matrix[i][j] + somma.matrix[i][j] );
                 std::cout << "" << d->matrix[i][j];
             }
             std::cout << std::endl;
@@ -117,19 +117,22 @@ MatrixTemplate<T> MatrixTemplate<T>::somma(MatrixTemplate<T>& a) {
 }
 
 template <typename T>
-MatrixTemplate<T> MatrixTemplate<T>::sommascalare(T scalare) {
-    MatrixTemplate<T> *d = new MatrixTemplate<T>(rows,columns);
-    for (int i = 0; i < (rows); i = i + 1) {
-        for (int j = 0; j < (columns); j = j + 1) {
-            d->matrix[i][j] = 0;
-            d->matrix[i][j] = d->matrix[i][j] + ( matrix[i][j] + scalare );
-            std::cout << "" << d->matrix[i][j];
+MatrixTemplate<T>& MatrixTemplate<T>::operator=(const MatrixTemplate<T>&ugualianza){
+    if(this!=&ugualianza){
+        delete[] matrix;
+        rows=ugualianza.rows;
+        columns=ugualianza.columns;
+        T** matrix= new T*[columns];
+        for(int i=0;i<columns;i=i+1){
+            matrix[i]= new T[rows];
         }
-        std::cout<<std::endl;
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<columns;j++){
+                matrix[i][j]=ugualianza.matrix[i][j];
+            }
+        }
     }
-    return (*d);
 }
-
 
 template <typename T>
 MatrixTemplate<T> MatrixTemplate<T>::trasposta() {
@@ -145,11 +148,11 @@ MatrixTemplate<T> MatrixTemplate<T>::trasposta() {
 
 template <typename T>
 T MatrixTemplate<T>::selection(int m,int n){
-    if(m>=(rows)){
+    if(m>=(rows) || m<0){
         throw std::out_of_range( "riga oltre dimensione");
 
     }
-    if(n>=(columns)){
+    if(n>=(columns) || n<0){
         throw std::out_of_range( "colonna oltre dimensione");
     }
     std::cout<<matrix[m][n]<<std::endl;
@@ -158,7 +161,13 @@ T MatrixTemplate<T>::selection(int m,int n){
 
 template <typename T>
 void MatrixTemplate<T>::insert(T v,int x,int y){
+    if(x>=(rows) || x<0){
+        throw std::out_of_range( "riga oltre dimensione");
 
+    }
+    if(y>=(columns) || y<0){
+        throw std::out_of_range( "colonna oltre dimensione");
+    }
     matrix[x][y]=v;
 }
 

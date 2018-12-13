@@ -44,11 +44,40 @@ TEST(MatrixTemplate, testSquareMatrix) {
     ASSERT_EQ(anwser, true);
 }
 
-TEST(MatrixTemplate, testSelectRow) {
+TEST(MatrixTemplate, testSelectFail) {
     MatrixTemplate<int> testMatrix(2, 2);
     ASSERT_THROW(testMatrix.selection(3, 0), std::out_of_range);
     EXPECT_THROW(testMatrix.selection(0, 3), std::out_of_range);
 }
+
+TEST(MatrixTemplate, testSelect){
+    MatrixTemplate<int> testMatrix(2, 2);
+    testMatrix.insert(1,0,0);
+    testMatrix.insert(2,0,1);
+    testMatrix.insert(3,1,0);
+    testMatrix.insert(4,1,1);
+    ASSERT_EQ(testMatrix.selection(0,0),1);
+    ASSERT_EQ(testMatrix.selection(0,1),2);
+    ASSERT_EQ(testMatrix.selection(1,0),3);
+    ASSERT_EQ(testMatrix.selection(1,1),4);
+}
+TEST(MatrixTemplate, testInsertFail) {
+    MatrixTemplate<int> testMatrix(2, 2);
+    ASSERT_THROW(testMatrix.insert(4,7,9), std::out_of_range);
+}
+
+TEST(MatrixTemplate, testInsert){
+    MatrixTemplate<int> testMatrix(2, 2);
+    testMatrix.insert(1,0,0);
+    testMatrix.insert(2,0,1);
+    testMatrix.insert(3,1,0);
+    testMatrix.insert(4,1,1);
+    ASSERT_EQ(testMatrix.selection(0,0),1);
+    ASSERT_EQ(testMatrix.selection(0,1),2);
+    ASSERT_EQ(testMatrix.selection(1,0),3);
+    ASSERT_EQ(testMatrix.selection(1,1),4);
+}
+
 
 TEST(MatrixTemplate, testTranspose) {
     MatrixTemplate<int> firstMatrix(2, 2);
@@ -80,7 +109,7 @@ TEST(MatrixTemplate, testProduct){
             treMatrix.insert((rand() % 10) + 1,i,j);
         }
     }
-    MatrixTemplate<int> productMatrix = secondMatrix.product(treMatrix);
+    MatrixTemplate<int> productMatrix = secondMatrix * (treMatrix);
     ASSERT_EQ(productMatrix.selection(0,0), ( secondMatrix.selection(0,0)*treMatrix.selection(0,0) ) + ( secondMatrix.selection(0,1)*treMatrix.selection(1,0) ) + ( secondMatrix.selection(0,2)*treMatrix.selection(2,0) ) );
     ASSERT_EQ(productMatrix.selection(0,1), ( secondMatrix.selection(0,0)*treMatrix.selection(0,1) ) + ( secondMatrix.selection(0,1)*treMatrix.selection(1,1) ) + ( secondMatrix.selection(0,2)*treMatrix.selection(2,1) ) );
     ASSERT_EQ(productMatrix.selection(1,0), ( secondMatrix.selection(1,0)*treMatrix.selection(0,0) ) + ( secondMatrix.selection(1,1)*treMatrix.selection(1,0) ) + ( secondMatrix.selection(1,2)*treMatrix.selection(2,0) ) );
@@ -96,7 +125,7 @@ TEST(MatrixTemplate, testProductScalare){
             Matrix.insert((rand() % 10) + 1,i,j);
         }
     }
-    MatrixTemplate<int> product1Matrix = Matrix.productscalare(3);
+    MatrixTemplate<int> product1Matrix = Matrix * (3);
     ASSERT_EQ(product1Matrix.selection(0,0), Matrix.selection(0,0)*3 );
     ASSERT_EQ(product1Matrix.selection(0,1), Matrix.selection(0,1)*3 );
     ASSERT_EQ(product1Matrix.selection(1,0), Matrix.selection(1,0)*3 );
@@ -118,7 +147,7 @@ TEST(MatrixTemplate,testProductFail){
             Matrix2.insert((rand() % 10) + 1,i,j);
         }
     }
-    ASSERT_THROW(Matrix1.product(Matrix2), std::out_of_range);
+    ASSERT_THROW(Matrix1 * (Matrix2), std::out_of_range);
 }
 
 TEST(MatrixTemplate, testSomma){
@@ -136,27 +165,12 @@ TEST(MatrixTemplate, testSomma){
             treMatrix.insert((rand() % 10) + 1,i,j);
         }
     }
-    MatrixTemplate<int> sommaMatrix = secondMatrix.somma(treMatrix);
+    MatrixTemplate<int> sommaMatrix = secondMatrix + (treMatrix);
     ASSERT_EQ(sommaMatrix.selection(0,0), ( secondMatrix.selection(0,0) + treMatrix.selection(0,0) ) );
     ASSERT_EQ(sommaMatrix.selection(0,1), ( secondMatrix.selection(0,1) + treMatrix.selection(0,1) ) );
     ASSERT_EQ(sommaMatrix.selection(1,0), ( secondMatrix.selection(1,0) + treMatrix.selection(1,0) ) );
     ASSERT_EQ(sommaMatrix.selection(1,1), ( secondMatrix.selection(1,1) + treMatrix.selection(1,1) ) );
 
-}
-
-TEST(MatrixTemplate, testSommaScalare){
-    MatrixTemplate<int>Matrix(2,2);
-    srand((unsigned) time(nullptr));
-    for (int i = 0; i < Matrix.getRows(); i++) {
-        for (int j = 0; j < Matrix.getColumns(); j++) {
-            Matrix.insert((rand() % 10) + 1,i,j);
-        }
-    }
-    MatrixTemplate<int> sommaMatrix = Matrix.sommascalare(3);
-    ASSERT_EQ(sommaMatrix.selection(0,0), Matrix.selection(0,0)+3 );
-    ASSERT_EQ(sommaMatrix.selection(0,1), Matrix.selection(0,1)+3 );
-    ASSERT_EQ(sommaMatrix.selection(1,0), Matrix.selection(1,0)+3 );
-    ASSERT_EQ(sommaMatrix.selection(1,1), Matrix.selection(1,1)+3 );
 }
 
 TEST(MatrixTemplate,testSommaFail){
@@ -174,5 +188,5 @@ TEST(MatrixTemplate,testSommaFail){
             Matrix2.insert((rand() % 10) + 1,i,j);
         }
     }
-    ASSERT_THROW(Matrix1.somma(Matrix2), std::out_of_range);
+    ASSERT_THROW(Matrix1 + (Matrix2), std::out_of_range);
 }
